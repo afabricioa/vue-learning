@@ -1,6 +1,8 @@
 import AssignmentCreate from "./AssignmentCreate.js";
 import AssignmentList from "./AssignmentList.js";
 
+//can-hide é uma flag, aqui ela é usava para mostrar o X apenas no Completed assignments
+//por causa da tag <slot></slot> no componente list ele add qualquer coisa no espaço
 export default {
     components: {
         'assignments-list': AssignmentList,
@@ -8,19 +10,22 @@ export default {
     },
     template: 
     `
-        <section class="space-y-6">
-            <assignments-list :assignments="filters.inProgress" title="In Progress"></assignments-list>
-            <assignments-list :assignments="filters.completed" title="Completed Assignments"></assignments-list>
-            <assignment-create @addAssignment="add"></assignment-create>
+        <section class="flex gap-8">
+            <assignments-list :assignments="filters.inProgress" title="In Progress">
+                <assignment-create @addAssignment="add"></assignment-create> 
+            </assignments-list>
+            <assignments-list :assignments="filters.completed" title="Completed Assignments" can-hide></assignments-list>
         </section>
     `,
+    created(){ // dispara quando o componente tá sendo criado
+        fetch(`http://localhost:3001/assignments`)
+        .then(response => response.json())
+        .then(data => this.assignments = data)
+    }, 
+    // mounted(){}, dispara quando o componente finaliza a montagem = componentDidMount
     data() {
         return {
-            assignments: [
-                {name: 'Finish project', complete: false, id: 1},
-                {name: 'Read Chapter 4', complete: false, id: 2},
-                {name: 'Turn in homework', complete: false, id: 3}
-            ]
+            assignments: []
         }
     },
     computed: {
